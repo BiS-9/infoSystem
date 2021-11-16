@@ -10,7 +10,7 @@ or
 
 ```./PATH/infoSystem.sh```
 
-![infoSystem.sh](https://blogger.googleusercontent.com/img/a/AVvXsEjgfLsRCPVAaem2tnnAQmyAzOM265V-tGXXUi2hW3ANLMDGtJroCcii0_qjns4eNkIIuVwViL_kT0rBtanfkpkMviLvMG2kaSCCgeGpiuf3pvaL12cAxF6r0S1fSDixzRH6_EN0mcnnqzU7tPjNAsHFxmhp9eJks7ofuDUoC0D0qXup0L0ZpCeJQMMIvA=w400-h364)
+![infoSystem.sh](https://github.com/BiS-9/infoSystem/blob/main/infosystem.png)
 
 ## Author
 [Bi$](https://github.com/BiS-9)

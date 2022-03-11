@@ -10,7 +10,7 @@ or
 
 ```./PATH/infoSystem.sh```
 
-![infoSystem.sh](https://github.com/BiS-9/infoSystem/blob/main/Images/infosystem.png)
+![infoSystem.sh](https://github.com/BiS-9/infoSystem/blob/main/infoSistem.png)
 
 ## Author
 [Bi$](https://github.com/BiS-9)

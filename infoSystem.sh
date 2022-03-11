@@ -1,19 +1,19 @@
 #!/usr/bin/env bash
-#			 ___  _
-#			| . ><_> ||_
-#			| . \| |<_-<
-#			|___/|_|/__/
-#				 	 ||
+#                        ___  _
+#                       | . ><_> ||_
+#                       | . \| |<_-<
+#                       |___/|_|/__/
+#                                ||
 #
 #---------------------------------------------------------------------------------
-# Script     : infoSystem.sh
-# Description: Show OS information.
+# Script Name: infoSystem.sh
+# Description: Show system information
 # Version    : 0.1
-# Author     : Bi$ https://github.com//bis-9
-# Date       : 2021-11-13
+# Author     : Bi$ https://github.com/BiS-9
+# Date       : 2021-09-07
 # License    : GNU/GPL v3.0
 #---------------------------------------------------------------------------------
-# Use        : ./infoSystem.sh or /PATH/infoSystem.sh
+# Use        : ./infoSystem.sh or ./PATH/infoSystem.sh
 #---------------------------------------------------------------------------------
 
 # Colours
@@ -27,7 +27,7 @@
 # W=$'\e[0;37m'   # White
 # NC=$'\e[0m'     # No colour
 
-Bold colours
+# Bold colours
 # bB=$'\e[1;30'   # Black
 # RB=$'\e[1;31m'  # Red
 GB=$'\e[1;32m'  # Green
@@ -45,7 +45,7 @@ clear
 . /etc/os-release
 
 # Public IP
-pIP=$(dig whoami.akamai.net. @ns1-1.akamaitech.net. +short)
+pIP=$(dig whoami.akamai.net. @ns1-1.akamaitech.net. +short 2>/dev/null)
 publicIP(){
         if [ "$pIP" ]; then
                 echo "$pIP"
@@ -68,48 +68,77 @@ privateIP(){
 IFACE=$(/usr/sbin/ifconfig | grep tun0 | awk '{print $1}' | tr -d ':')
 vpnStatus(){
         if [ "$IFACE" == "tun0" ]; then
-                "$(/usr/sbin/ifconfig tun0 | grep "inet " | awk '{print $2}')"
+                echo -e "$(/usr/sbin/ifconfig tun0 | grep "inet " | awk '{print $2}')"
         else
                 echo "Disconected"
         fi
 }
 
+# Variable
+UserHostname=$USER@$HOSTNAME
+PublicIP=$(publicIP)
+PrivateIP=$(privateIP)
+VPN=$(vpnStatus)
+KERNEL=$(uname -rm)
+PACK=$(dpkg -l | wc -l)
+Shell=$($SHELL --version | awk '{print $1,$2}')
+Desktop=$XDG_CURRENT_DESKTOP
+Session=$DESKTOP_SESSION
+RESOLUTION=$(xdpyinfo | grep dimensions | sed -r 's/^[^0-9]*([0-9]+x[0-9]+).*$/\1/')
+THEME=$(awk '/ThemeName/' /home/"$USER"/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml |awk 'NR==1 {print}' | awk -F "=" '{print $NF}' | sed 's/"\/>//' | tr -d '"')
+ITHEME=$(awk '/IconThemeName/' /home/"$USER"/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml |awk 'NR==1 {print}' | awk -F "=" '{print $NF}' | sed 's/"\/>//' | tr -d '"')
+FONT=$(awk '/FontName/' /home/"$USER"/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml |awk 'NR==1 {print}' | awk -F "=" '{print $NF}' | sed 's/"\/>//' | tr -d '"')
+CPU=$(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')
+GPU1=$(lspci | grep 'VGA' | awk 'NR==1 {print}' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
+GPU2=$(lspci | grep 'VGA' | awk 'NR==2 {print}' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
+AUDIO1=$(lspci | grep 'Audio device' | awk 'NR==1 {print}' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
+AUDIO2=$(lspci | grep 'Audio device' | awk 'NR==2 {print}' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
+ETH=$(lspci | grep 'Ethernet' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
+WIFI=$(lspci | grep 'Network' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
+RAM=$(free --giga | grep "Mem:" | awk '{print $2}')
+SWAP=$(free --giga | grep "Swap:" | awk '{print $2}')
+ROOT=$(df -h | grep 'nvme0n1p4' | awk '{print $2"\t"$3"\t"$4"\t"$5}')
+Home=$(df -h | grep 'nvme0n1p5' | awk '{print $2"\t"$3"\t"$4"\t"$5}')
+TERA1=$(df -h | grep 'sda1' | awk '{print $2"\t"$3"\t"$4"\t"$5}')
+TERA2=$(df -h | grep 'sda2' | awk '{print $2"\t"$3"\t"$4"\t"$5}')
+TMZ=$(cat /etc/timezone)
+
 # Main program
 echo -e "
-${YB} - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n${NC}
-${GB} User@Hostname:${NC}\t $USER@$HOSTNAME
-${GB} Public IP:${NC}\t $(publicIP)
-${GB} Local IP:${NC}\t $(privateIP)
-${GB} VPN Status:${NC}\t $(vpnStatus)
+${YB}- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n${NC}
+${CB} ${NC}${GB} User@Host:${NC}\t $UserHostname
+${CB}爵${NC}${GB} Public IP:${NC}\t $PublicIP
+${CB} ${NC}${GB} Local IP:${NC}\t $PrivateIP
+${CB}廬${NC}${GB} VPN Status:${NC}\t $VPN
 ${YB} \n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n${NC}
-${GB} OS:${NC}\t\t $PRETTY_NAME
-${GB} Version:${NC}\t $VERSION
-${GB} Kernel:${NC}\t $(uname -rm)
-${GB} Packages:${NC}\t $(dpkg -l | wc -l)
-${GB} Shell:${NC}\t\t $($SHELL --version | awk '{print $1,$2}')
-${GB} Desktop:${NC}\t $XDG_CURRENT_DESKTOP
-${GB} Session:${NC}\t $DESKTOP_SESSION
-${GB} Resolution:${NC}\t $(xdpyinfo | grep dimensions | sed -r 's/^[^0-9]*([0-9]+x[0-9]+).*$/\1/')
-${GB} Theme:${NC}\t\t $(awk '/ThemeName/' /home/"$USER"/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml |awk 'NR==1 {print}' | awk -F "=" '{print $NF}' | sed 's/"\/>//' | tr -d '"')
-${GB} Icon Theme:${NC}\t $(awk '/IconThemeName/' /home/"$USER"/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml |awk 'NR==1 {print}' | awk -F "=" '{print $NF}' | sed 's/"\/>//' | tr -d '"')
-${GB} Font:${NC}\t\t $(awk '/FontName/' /home/"$USER"/.config/xfce4/xfconf/xfce-perchannel-xml/xsettings.xml |awk 'NR==1 {print}' | awk -F "=" '{print $NF}' | sed 's/"\/>//' | tr -d '"')
+${CB}漣${NC}${GB} OS:${NC}\t\t $PRETTY_NAME
+${CB} ${NC}${GB} Version:${NC}\t $VERSION
+${CB} ${NC}${GB} Kernel:${NC}\t $KERNEL
+${CB} ${NC}${GB} Packages:${NC}\t $PACK
+${CB} ${NC}${GB} Shell:${NC}\t $Shell
+${CB} ${NC}${GB} Desktop:${NC}\t $Desktop
+${CB} ${NC}${GB} Session:${NC}\t $Session
+${CB}ﬕ ${NC}${GB} Resolution:${NC}\t $RESOLUTION
+${CB} ${NC}${GB} Theme:${NC}\t $THEME
+${CB} ${NC}${GB} Icon Theme:${NC}\t $ITHEME
+${CB} ${NC}${GB} Font:${NC}\t $FONT
 ${YB} \n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n${NC}
-${GB} CPU:${NC}\t\t $(lscpu | grep 'Model name' | cut -f 2 -d ":" | awk '{$1=$1}1')
-${GB} GPU 1:${NC}\t\t $(lspci | grep 'VGA' | awk 'NR==1 {print}' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
-${GB} GPU 2:${NC}\t\t $(lspci | grep 'VGA' | awk 'NR==2 {print}' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
-${GB} Audio 1:${NC}\t $(lspci | grep 'Audio device' | awk 'NR==1 {print}' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
-${GB} Audio 2:${NC}\t $(lspci | grep 'Audio device' | awk 'NR==2 {print}' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
-${GB} Ethernet:${NC}\t $(lspci | grep 'Ethernet' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
-${GB} WiFi:${NC}\t\t $(lspci | grep 'Network' | cut -f3- -d ":" | sed 's/^[[:space:]]*//')
-${GB} RAM:${NC}\t\t $(free --giga | grep "Mem:" | awk '{print $2}') Gb
-${GB} SWAP:${NC}\t\t  $(free --giga | grep "Swap:" | awk '{print $2}') Gb
+${CB} ${NC}${GB} CPU:${NC}\t\t $CPU
+${CB} ${NC}${GB} GPU 1:${NC}\t $GPU1
+${CB} ${NC}${GB} GPU 2:${NC}\t $GPU2
+${CB} ${NC}${GB} Audio 1:${NC}\t $AUDIO1
+${CB}V ${NC}${GB} Audio 2:${NC}\t $AUDIO2
+${CB} ${NC}${GB} Ethernet:${NC}\t $ETH
+${CB}直${NC}${GB} WiFi:${NC}\t $WIFI
+${CB}﬙ ${NC}${GB} RAM:${NC}\t\t $RAM Gb
+${CB} ${NC}${GB} SWAP:${NC}\t  $SWAP Gb
 ${YB} \n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n${NC}
-${GB} STORAGE:${NC}\t SIZE\tUSE\tAVAI\tUS%
-${GB} /:${NC}\t\t $(df -h | grep 'nvme0n1p4' | awk '{print $2"\t"$3"\t"$4"\t"$5}')
-${GB} HOME:${NC}\t\t $(df -h | grep 'nvme0n1p5' | awk '{print $2"\t"$3"\t"$4"\t"$5}')
-${GB} TERA1:${NC}\t\t $(df -h | grep 'sda1' | awk '{print $2"\t"$3"\t"$4"\t"$5}')
-${GB} TERA2:${NC}\t\t $(df -h | grep 'sda2' | awk '{print $2"\t"$3"\t"$4"\t"$5}')
+${CB}${NC}${GB} STORAGE:${NC}\t ${CB}SIZE${NC}\t${CB}USE${NC}\t${CB}AVAI${NC}\t${CB}US%${NC}
+${CB} ${NC}${GB} /:${NC}\t\t $ROOT
+${CB} ${NC}${GB} HOME:${NC}\t $Home
+${CB} ${NC}${GB} TERA1:${NC}\t $TERA1
+${CB} ${NC}${GB} TERA2:${NC}\t $TERA2
 ${YB} \n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -\n${NC}
-${GB} Timezone:${NC}\t $(cat /etc/timezone)
+${CB} ${NC}${GB} Timezone:${NC}\t $TMZ
 ${YB} \n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -${NC}
 "

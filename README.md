@@ -1,7 +1,7 @@
 # infoSystem
 Show operating system information.
 
-This script has only been tested on *5.14.0-kali2-amd64 x86_64*, with **XFCE** desktop.
+This script has only been tested on *5.16.0-kali3-amd64 x86_64*, with **XFCE** desktop.
 
 ## How to use?
 ```./infoSystem.sh```
